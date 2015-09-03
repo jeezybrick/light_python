@@ -1,0 +1,17 @@
+{% extends 'notes/layout.html' %}
+
+{% load bootstrap3 %}
+{% block title %}
+    {{ note.title }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{ note.title }}</h1>
+    <h3>
+        <small>Автор:<a href="#">{{ note.user.username }}</a></small>
+    </h3>
+    <pre>{{ note.message }}</pre>
+    <hr>
+
+{% endblock %}

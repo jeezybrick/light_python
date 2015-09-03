@@ -24,4 +24,7 @@ urlpatterns = [
         name='logout'),
     url(r"^auth/register/$", 'notes.views.register', name='register'),
     url(r"^auth/register/success/$", 'notes.views.register_success', name='register_success'),
+    url(r"^users/(?P<username>\w+)/notes/$", 'notes.views.user_notes', name='user_notes'),
+    url(r"^users/(?P<username>\w+)/notes/add/$", 'notes.views.user_notes_add', name='user_notes_add'),
+    url(r"^users/(?P<username>\w+)/notes/(?P<note_id>[0-9]+)/$", 'notes.views.user_notes_show', name='user_notes_show'),
 ]

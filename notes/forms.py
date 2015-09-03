@@ -9,6 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Notes
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
 
@@ -22,7 +23,7 @@ class BootstrapAuthenticationForm(AuthenticationForm):
     password = forms.CharField(label=_("Пароль"),
                                widget=forms.PasswordInput({
                                    'class': 'form-control',
-                                   'placeholder': 'Введите ваш логин'}))
+                                   'placeholder': 'Введите ваш пароль'}))
 
 
 class MyRegForm(UserCreationForm):
@@ -54,3 +55,11 @@ class MyRegForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+
+class AddNoteForm(forms.ModelForm):
+    message = forms.CharField(label='Текст', widget=forms.Textarea(attrs={'cols': 20, 'rows': 5}))
+
+    class Meta:
+        model = Notes
+        fields = ('title', 'message', )

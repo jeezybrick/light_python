@@ -1,0 +1,28 @@
+{% extends 'notes/layout.html' %}
+{%  block title %}
+Мои заметки
+{% endblock %}
+
+{%  block content %}
+   {% if user.is_authenticated %}
+         <h1>Ваши заметки</h1>
+            <ol class="breadcrumb">
+                    <li><a href="{% url 'home' %}">Главная</a></li>
+                    <li class="active">Мои заметки</li>
+                    <a href="{% url 'user_notes_add' request.user.username %}" class="btn btn-default pull-right">Добавить заметку</a>
+                </ol>
+            <hr>
+       {% for article in notes %}
+        <h4><a href="{%  url 'user_notes_show' request.user.username article.id %}">{{ article.title }}</a></h4>
+        <pre>{{ article.message }}</pre>
+    {% empty %}
+        <h4>
+            <p>Вы еще не создавали заметок!</p>
+            <p><a href="{% url 'user_notes_add' request.user.username %}">Создайте ее прямо сейчас.</a></p>
+        </h4>
+    {% endfor %}
+
+   {% else %}
+    <h1 class="text-center">Вы не вошли на сайт!</h1>
+    {% endif %}
+{% endblock %}
