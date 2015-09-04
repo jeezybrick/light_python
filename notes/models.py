@@ -5,10 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 class ColorOfNote(models.Model):
-    color = models.CharField(_("Цвет заметки"), max_length=30, blank=True)
+    name = models.CharField(_("Цвет заметки"), max_length=30, blank=True)
+    color = models.CharField(_("Цвет в hex"), max_length=30, blank=True)
 
     def __str__(self):
-        return self.color
+        return self.name
 
 
 class Notes(models.Model):
