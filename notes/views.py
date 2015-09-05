@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import MyUser, Notes
-from .forms import MyRegForm, AddNoteForm, EditProfileForm
+from .forms import MyRegForm, ModifyNoteForm, EditProfileForm
 # Create your views here.
 
 
@@ -48,20 +48,7 @@ def user_show(request, username):
 
 @login_required(login_url='/auth/login/')
 def user_notes(request, username):
-    if request.method == 'POST':
-        form = AddNoteForm(request.POST)
-        if form.is_valid():
-            first = form.save(commit=False)
-            first.user = request.user
-            first.save()
-            form.save_m2m()
-            # first.tags.add(*form.cleaned_data['tags'])
-            return HttpResponseRedirect('/users/'+username+'/notes/')
-        else:
-            foo = 'Редактирование/Добавление'
-            return render(request, 'notes/notes/modify.html', {'form': form,
-                                                               'foo': foo})
-    else:
+
         user_owner = get_object_or_404(MyUser, username=username)
         if user_owner.username == request.user.username or not user_owner.is_private:
             pass
@@ -73,10 +60,8 @@ def user_notes(request, username):
         try:
             notes = paginator.page(page)
         except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
             notes = paginator.page(1)
         except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
             # raise Http404("Новости с таким адресом не существует")
             notes = paginator.page(paginator.num_pages)
         return render(request, 'notes/notes/index.html', {'notes': notes, 'user_owner': user_owner})
@@ -99,25 +84,33 @@ def user_notes_modify(request, username, note_id=None):
         try:
             note = request.user.notes_set.get(id=note_id)
         except:
-            raise Exception('Вы пытаетесь добавить или редактировать заметку другому пользователю?')
-        foo = 'Редактирование'
+            raise Exception('Вы пытаетесь редактировать заметку другому пользователю?')
+        foo = 'Редактировать'
     else:
         user_owner = get_object_or_404(MyUser, username=username)
         if not user_owner.username == request.user.username:
-            raise Exception('Вы пытаетесь добавить или редактировать заметку другому пользователю?')
+            raise Exception('Вы пытаетесь добавить заметку другому пользователю?')
         note = None
-        foo = 'Добавление'
-
+        foo = 'Добавить'
     if request.method == 'POST':
-        form = AddNoteForm(request.POST, instance=note)
+        print('post')
+        form = ModifyNoteForm(request.POST, instance=note)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/users/'+username+'/notes/'+note_id+'/')
+            first = form.save(commit=False)
+            first.user = request.user
+            first.save()
+            form.save_m2m()
+            return HttpResponseRedirect('/users/'+username+'/notes/'+str(first.id)+'/')
         return render(request, 'notes/notes/modify.html', {'form': form, 'note': note})
+    elif request.method == 'DELETE':
+        print('delete')
+        return HttpResponseRedirect('/')
     else:
-        form = AddNoteForm(instance=note)
+        print('get')
+        form = ModifyNoteForm(instance=note)
 
-    return render(request, 'notes/notes/modify.html', {'note': note, 'form': form, 'foo': foo})
+    return render(request, 'notes/notes/modify.html', {'note': note, 'form': form,
+                                                       'foo': foo})
 
 
 @login_required(login_url='/auth/login/')

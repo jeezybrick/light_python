@@ -5,18 +5,27 @@ Definition of forms.
 """
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
-from .models import Notes, MyUser
+from .models import Notes, MyUser, Category
 from .widgets import MyWidgetForColor, MyWidgetForLabels
-
+MEDIA_CHOICES = (
+        ('Audio', (
+            ('vinyl', 'Vinyl'),
+            ('cd', 'CD'),
+        )
+         ),
+        ('Video', (
+            ('vhs', 'VHS Tape'),
+            ('dvd', 'DVD'),
+        )
+         ),
+)
 
 class MyLoginForm(AuthenticationForm):
-    """Authentication form which uses boostrap CSS."""
+
     username = forms.CharField(label='Логин', max_length=254,
                                widget=forms.TextInput({
                                    'class': 'form-control',
@@ -39,7 +48,8 @@ class MyRegForm(UserCreationForm):
                                                              'и  @/./+/-/_ символов.',
                                                              'invalid'),
                                    ],
-                               error_messages={'required': 'Это поле обязательное к запонению'}
+                               error_messages={'required': 'Это поле обязательное к запонению',
+                                               'unique': 'Пользователь с таким логином уже существует'}
                                )
     password1 = forms.CharField(min_length=6, label='Пароль', widget=forms.PasswordInput,
                                 help_text="Минимум 6 символов",)
@@ -50,6 +60,8 @@ class MyRegForm(UserCreationForm):
                                 error_messages={'required': 'Это поле обязательное к запонению'})
     first_name = forms.CharField(max_length=50, label='Имя',
                                  error_messages={'required': 'Это поле обязательное к запонению'})
+    email = forms.EmailField(label='Email', required=True,
+                             error_messages={'unique': 'Пользователь с таким email уже существует'})
     phone = forms.CharField(max_length=30, label='Телефон',
                             help_text='Телефон в формате ***-*******',
                             validators=[
@@ -73,16 +85,36 @@ class MyRegForm(UserCreationForm):
         return user
 
 
-class AddNoteForm(forms.ModelForm):
+def categories_as_choices():
+    categories = []
+    for category in Category.objects.filter(parent_category_id__isnull=True):
+        new_category = []
+        sub_categories = []
+        for sub_category in category.category_set.all():
+            sub_categories.append([sub_category.id, sub_category.name])
+
+        new_category = [category.name, sub_categories]
+        categories.append(new_category)
+
+    return categories
+
+
+class ModifyNoteForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ModifyNoteForm, self).__init__(*args, **kwargs)
+
     message = forms.CharField(label='Текст', widget=forms.Textarea(attrs={'cols': 20, 'rows': 5}))
+    categories = forms.MultipleChoiceField(required=False,
+                                           choices=categories_as_choices())
 
     class Meta:
         model = Notes
-        fields = ('title', 'message', 'color', 'tags', 'labels', )
+        fields = ('title', 'message', 'color', 'categories', 'labels', )
         widgets = {
-            'tags': forms.CheckboxSelectMultiple(attrs={'class': 'lal'}),
-            'labels': MyWidgetForLabels(),
-            'color': MyWidgetForColor(),
+            # 'categories': forms.CheckboxSelectMultiple(attrs={'class': 'lal'}),
+            'labels': MyWidgetForLabels(attrs={'class': 'label_picker'}),
+            # 'color': MyWidgetForColor(),
         }
 
 
@@ -90,12 +122,6 @@ class EditProfileForm(forms.ModelForm):
 
     date_of_birth = forms.DateField(label='Дата рождения', required=True,
                                     widget=SelectDateWidget(empty_label="Nothing"))
-    phone = forms.CharField(max_length=30, label='Телефон',
-                            help_text='Телефон в формате ***-*******',
-                            validators=[
-                                validators.RegexValidator(r'^\d{3}\-\d{7}$',
-                                                          'Введите телефон в правильном формате!(***-*******)',
-                                                          'invalid'), ])
 
     class Meta:
         model = MyUser

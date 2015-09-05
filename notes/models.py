@@ -12,10 +12,13 @@ class MyUser(AbstractUser):
     is_private = models.BooleanField(_('Приватные заметки'), default=True, blank=True)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['date_of_birth', 'phone']
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return self.username
+
+    class Meta(object):
+        unique_together = ('email',)
 
 
 class ColorOfNote(models.Model):
@@ -23,11 +26,12 @@ class ColorOfNote(models.Model):
     color = models.CharField(_("Цвет в hex"), max_length=30, blank=True)
 
     def __str__(self):
-        return self.color
+        return self.name
 
 
-class Tag(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=50)
+    parent_category = models.ForeignKey("self", blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -46,7 +50,7 @@ class Notes(models.Model):
     file = models.FileField(_("Файлы"), upload_to='cars', blank=True)
     color = models.ForeignKey(ColorOfNote, blank=True, default='1', null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    tags = models.ManyToManyField(Tag, blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
     labels = models.ManyToManyField(LabelDefault, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
