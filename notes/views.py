@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import User, Notes
-from .forms import MyRegForm, AddNoteForm
+from .forms import MyRegForm, AddNoteForm, EditProfileForm
 # Create your views here.
 
 
@@ -52,7 +52,9 @@ def user_notes(request, username):
             # first.tags.add(*form.cleaned_data['tags'])
             return HttpResponseRedirect('/users/'+username+'/notes/')
         else:
-            return render(request, 'notes/notes/modify.html', {'form': form})
+            foo = 'Редактирование/Добавление'
+            return render(request, 'notes/notes/modify.html', {'form': form,
+                                                               'foo': foo})
     else:
         user_owner = get_object_or_404(User, username=username)
         if user_owner.username == request.user.username or not user_owner.is_private:
@@ -74,7 +76,6 @@ def user_notes(request, username):
         return render(request, 'notes/notes/index.html', {'notes': notes, 'user_owner': user_owner})
 
 
-
 @login_required(login_url='/auth/login/')
 def user_notes_show(request, username, note_id):
     user_owner = get_object_or_404(User, username=username)
@@ -83,15 +84,7 @@ def user_notes_show(request, username, note_id):
         pass
     else:
         raise Exception('Этот пользователь закрыл свои заметки.')
-    if request.method == 'POST':
-        form = AddNoteForm(request.POST, instance=note)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/users/'+request.user.username+'/notes/'+note_id+'/')
-        else:
-            return render(request, 'notes/notes/modify.html', {'form': form, 'note': note})
-    else:
-        return render(request, 'notes/notes/show.html', {'note': note})
+    return render(request, 'notes/notes/show.html', {'note': note})
 
 
 @login_required(login_url='/auth/login/')
@@ -119,3 +112,20 @@ def user_notes_modify(request, username, note_id=None):
         form = AddNoteForm(instance=note)
 
     return render(request, 'notes/notes/modify.html', {'note': note, 'form': form, 'foo': foo})
+
+
+@login_required(login_url='/auth/login/')
+def personal_show(request):
+    return render(request, 'notes/personal/show.html')
+
+
+@login_required(login_url='/auth/login/')
+def personal_edit(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/personal/')
+    else:
+        form = EditProfileForm(instance=request.user)
+    return render(request, 'notes/personal/edit.html', {'form': form})
