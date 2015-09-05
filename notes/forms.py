@@ -5,23 +5,23 @@ Definition of forms.
 """
 
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
-from .models import Notes
+from .models import Notes, MyUser
 from .widgets import MyWidgetForColor, MyWidgetForLabels
 
 
-class BootstrapAuthenticationForm(AuthenticationForm):
+class MyLoginForm(AuthenticationForm):
     """Authentication form which uses boostrap CSS."""
-    username = forms.CharField(max_length=254,
+    username = forms.CharField(label='Логин', max_length=254,
                                widget=forms.TextInput({
                                    'class': 'form-control',
                                    'placeholder': 'Введите ваш логин'}))
-    password = forms.CharField(label=_("Пароль"),
+    password = forms.CharField(label="Пароль",
                                widget=forms.PasswordInput({
                                    'class': 'form-control',
                                    'placeholder': 'Введите ваш пароль'}))
@@ -61,7 +61,7 @@ class MyRegForm(UserCreationForm):
                                     error_messages={'invalid': 'Неверный формат даты'})
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ('last_name', 'first_name', 'username', 'email', 'password1', 'password2', 'date_of_birth', 'phone')
 
     def save(self, commit=True):
@@ -98,6 +98,6 @@ class EditProfileForm(forms.ModelForm):
                                                           'invalid'), ])
 
     class Meta:
-        model = User
+        model = MyUser
         fields = ('last_name', 'first_name', 'username', 'email', 'date_of_birth', 'phone', 'is_private', )
         exclude = ('password',)

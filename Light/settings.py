@@ -37,7 +37,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'notes',
+    'bootstrap3',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -105,3 +107,4 @@ STATIC_URL = '/static/'
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+AUTH_USER_MODEL = 'notes.MyUser'

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import User, Notes
+from .models import MyUser, Notes
 from .forms import MyRegForm, AddNoteForm, EditProfileForm
 # Create your views here.
 
@@ -28,7 +28,7 @@ def register_success(request):
 
 
 def users(request):
-    users_list = User.objects.order_by('id')
+    users_list = MyUser.objects.order_by('id')
     paginator = Paginator(users_list, 2)
     page = request.GET.get('page')
     try:
@@ -38,6 +38,12 @@ def users(request):
     except EmptyPage:
         users_list = paginator.page(paginator.num_pages)
     return render(request, 'notes/users/index.html', {'users_list': users_list})
+
+
+@login_required(login_url='/auth/login/')
+def user_show(request, username):
+    user = get_object_or_404(MyUser, username=username)
+    return render(request, 'notes/users/show.html', {'user': user})
 
 
 @login_required(login_url='/auth/login/')
@@ -56,7 +62,7 @@ def user_notes(request, username):
             return render(request, 'notes/notes/modify.html', {'form': form,
                                                                'foo': foo})
     else:
-        user_owner = get_object_or_404(User, username=username)
+        user_owner = get_object_or_404(MyUser, username=username)
         if user_owner.username == request.user.username or not user_owner.is_private:
             pass
         else:
@@ -78,7 +84,7 @@ def user_notes(request, username):
 
 @login_required(login_url='/auth/login/')
 def user_notes_show(request, username, note_id):
-    user_owner = get_object_or_404(User, username=username)
+    user_owner = get_object_or_404(MyUser, username=username)
     note = get_object_or_404(Notes, id=note_id)
     if user_owner.username == request.user.username or not user_owner.is_private:
         pass
@@ -96,7 +102,7 @@ def user_notes_modify(request, username, note_id=None):
             raise Exception('Вы пытаетесь добавить или редактировать заметку другому пользователю?')
         foo = 'Редактирование'
     else:
-        user_owner = get_object_or_404(User, username=username)
+        user_owner = get_object_or_404(MyUser, username=username)
         if not user_owner.username == request.user.username:
             raise Exception('Вы пытаетесь добавить или редактировать заметку другому пользователю?')
         note = None
