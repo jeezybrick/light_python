@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import MyUser, Notes
-from .forms import MyRegForm, ModifyNoteForm, EditProfileForm
-# Create your views here.
+from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm
+from PIL import Image
 
 
 def home(request):
@@ -93,8 +93,7 @@ def user_notes_modify(request, username, note_id=None):
         note = None
         foo = 'Добавить'
     if request.method == 'POST':
-        print('post')
-        form = ModifyNoteForm(request.POST, instance=note)
+        form = ModifyNoteForm(request.POST, request.FILES, instance=note)
         if form.is_valid():
             first = form.save(commit=False)
             first.user = request.user
@@ -102,15 +101,22 @@ def user_notes_modify(request, username, note_id=None):
             form.save_m2m()
             return HttpResponseRedirect('/users/'+username+'/notes/'+str(first.id)+'/')
         return render(request, 'notes/notes/modify.html', {'form': form, 'note': note})
-    elif request.method == 'DELETE':
-        print('delete')
-        return HttpResponseRedirect('/')
     else:
-        print('get')
         form = ModifyNoteForm(instance=note)
 
     return render(request, 'notes/notes/modify.html', {'note': note, 'form': form,
                                                        'foo': foo})
+
+
+@login_required(login_url='/auth/login/')
+def user_notes_delete(request, username, note_id):
+    if request.method == 'POST':
+        user_owner = get_object_or_404(MyUser, username=username)
+        if not user_owner.username == request.user.username:
+            raise Exception('Вы пытаетесь удалить заметку другому пользователю?')
+        note = get_object_or_404(Notes, id=note_id)
+        note.delete()
+    return HttpResponseRedirect('/users/'+username+'/notes')
 
 
 @login_required(login_url='/auth/login/')
@@ -128,3 +134,30 @@ def personal_edit(request):
     else:
         form = EditProfileForm(instance=request.user)
     return render(request, 'notes/personal/edit.html', {'form': form})
+
+
+@login_required(login_url='/auth/login/')
+def user_notes_labels_add(request, username, note_id):
+    if request.method == 'POST':
+        form = AddLabelForm(request.POST, request.FILES)
+        if form.is_valid():
+            note = request.user.notes_set.get(id=note_id)
+            first = form.save(commit=False)
+            first.note = note
+            first.save()
+            return HttpResponseRedirect('/users/'+request.user.username+'/notes/')
+    else:
+        form = AddLabelForm()
+    return render(request, 'notes/labels/add.html', {'form': form})
+
+
+@login_required(login_url='/auth/login/')
+def personal_edit_avatar(request):
+    if request.method == 'POST':
+        form = EditAvatarForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/personal/')
+    else:
+        form = EditAvatarForm(instance=request.user)
+    return render(request, 'notes/users/avatar.html', {'form': form})

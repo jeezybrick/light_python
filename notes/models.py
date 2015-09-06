@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 class MyUser(AbstractUser):
     date_of_birth = models.DateField(default=datetime.datetime.now)
     phone = models.CharField(_('Телефон'), max_length=40, default='', blank=False, null=False)
+    avatar = models.ImageField(upload_to='notes/avatars/', blank=True, null=True)
     is_private = models.BooleanField(_('Приватные заметки'), default=True, blank=True)
 
     USERNAME_FIELD = 'username'
@@ -47,7 +48,7 @@ class LabelDefault(models.Model):
 class Notes(models.Model):
     title = models.CharField(_('Название'), max_length=50, blank=False)
     message = models.CharField(_("Текст"), max_length=1000, blank=False)
-    file = models.FileField(_("Файлы"), upload_to='cars', blank=True)
+    file = models.FileField(upload_to='notes/files/', blank=True)
     color = models.ForeignKey(ColorOfNote, blank=True, default='1', null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     categories = models.ManyToManyField(Category, blank=True)
@@ -57,3 +58,11 @@ class Notes(models.Model):
 
     def __str__(self):
         return self.message
+
+
+class LabelCustom(models.Model):
+    file = models.ImageField(upload_to='notes/labels/custom/', blank=True)
+    note = models.ForeignKey(Notes, blank=True, null=True)
+
+    def __str__(self):
+        return str(self.file)
