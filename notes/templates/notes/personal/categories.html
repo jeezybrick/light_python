@@ -1,0 +1,83 @@
+{% extends 'notes/layout.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title %}
+    Управление категориями
+{% endblock %}
+
+{% block content %}
+
+        <h1>Управление категориями</h1>
+        <ol class="breadcrumb">
+                    <li><a href="{% url 'home' %}">Главная</a></li>
+                    <li><a href="{% url 'personal_show' %}">Личный кабинет</a></li>
+                    <li class="active">Категории</li>
+        </ol>
+        <hr>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-controller="categoryCtrl">
+        {# Блок для Andular #}
+            {% verbatim %}
+                <div class="row">
+                    <div class="col-lg-6">
+                        <span class="help-block" ng-hide="empty">
+                                     Если вы хотите добавить еще категорий,подтвердите текущий свой выбор.</span>
+                        <div class="form-group">
+                            <label for="name">Родительская категория: <span class="error" ng-if="! cat.parent">*</span></label>
+                            <input type="text" name="parent" id="name" class="form-control" ng-model="cat.parent" ng-change="check()" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Подкатегории через запятую <small>(не обязательно)</small>: <span class="error" ng-if="! cat.sub">*</span></label>
+                            <textarea type="text" name="sub" id="message" class="form-control" ng-model="cat.sub" required></textarea>
+                        </div>
+                        <button ng-click="addCategory()" class="btn btn-info"
+                                ng-disabled = '!cat.parent || !empty'>Добавить</button>
+                    </div>
+                    {% endverbatim %}
+                    <div class="col-lg-6">
+                    <h2 style="margin-top: 0;">
+                        {% if parent_note %}
+                            Ваши текущие категории
+                        {% else %}
+                            У вас пока что нет категорий
+                        {% endif %}
+                    </h2>
+                    <form action="#" method="post">
+                    {% csrf_token %}
+                        {% for p_note in parent_note %}
+                             <ul>
+                                <li>
+                                    {{ p_note }} <a href="{% url 'personal_categories_delete'  p_note.id %}"
+                                        onclick="return confirm('Удаление родительской категории повличет за собой удаление всех ее подкатегорий!')">Удалить</a>
+                                    {% for sub_note in p_note.category_set.all %}
+                                    <ul>
+                                        <li>
+                                            {{ sub_note }} <a href="{% url 'personal_categories_delete'  sub_note.id %}">Удалить</a>
+                                        </li>
+                                    </ul>
+                                    {% endfor %}
+                                </li>
+                            </ul>
+                        {% endfor %}
+                    {% verbatim %}
+                    <h2 ng-hide="empty">Будут добавлены</h2>
+                        <ul ng-repeat="category in categories">
+                            <li>
+                                {{ category.parent }} <a href="" ng-click="removeName(category.parent)">remove</a>
+                                <input class="hidden" name="parent" type="text" value="{{ category.parent }}" />
+                                <ul>
+                                    <li ng-repeat="category_sub in category.sub">
+                                        {{ category_sub}}
+                                        <input class="hidden" name="child" type="text" value="{{ category_sub }}" />
+                                    </li>
+                                </ul>
+
+                            </li>
+                        </ul>
+                        <button class="btn btn-warning" ng-hide = 'empty'>Хорошо,добавить!</button>
+                    </form>
+                    </div>
+                </div>
+            {% endverbatim %}
+{% endblock %}

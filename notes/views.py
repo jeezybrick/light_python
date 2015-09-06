@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, render_to_response
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import MyUser, Notes
-from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm
+from django.contrib import messages
+from .models import MyUser, Notes, ColorOfNote, Category
+from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm, AddCategory
 from PIL import Image
 
 
@@ -93,6 +94,7 @@ def user_notes_modify(request, username, note_id=None):
         note = None
         foo = 'Добавить'
     if request.method == 'POST':
+        print(request.POST)
         form = ModifyNoteForm(request.POST, request.FILES, instance=note)
         if form.is_valid():
             first = form.save(commit=False)
@@ -121,7 +123,7 @@ def user_notes_delete(request, username, note_id):
 
 @login_required(login_url='/auth/login/')
 def personal_show(request):
-    return render(request, 'notes/personal/show.html')
+    return render(request, 'notes/personal/index.html')
 
 
 @login_required(login_url='/auth/login/')
@@ -130,6 +132,7 @@ def personal_edit(request):
         form = EditProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Личные данные успешно отредактированы!')
             return HttpResponseRedirect('/personal/')
     else:
         form = EditProfileForm(instance=request.user)
@@ -155,9 +158,42 @@ def user_notes_labels_add(request, username, note_id):
 def personal_edit_avatar(request):
     if request.method == 'POST':
         form = EditAvatarForm(request.POST, request.FILES, instance=request.user)
+        request.FILES['avatar'].name = str(request.user.username) + request.FILES['avatar'].name[-4:]
         if form.is_valid():
             form.save()
+            messages.success(request, 'Аватар успешно загружен!')
             return HttpResponseRedirect('/personal/')
     else:
         form = EditAvatarForm(instance=request.user)
     return render(request, 'notes/users/avatar.html', {'form': form})
+
+
+@login_required(login_url='/auth/login/')
+def personal_categories(request):
+    if request.method == 'POST':
+        try:
+            request.POST["parent"]
+        except:
+            raise Exception('Вы не ввели значение для главной категории!')
+        parent = Category(name=request.POST["parent"], user_id=request.user.id)
+        parent.save()
+        callback = 'Категория добалена!'
+        for value in request.POST.getlist("child"):
+            child = Category(name=value, parent_category_id=parent.id, user_id=request.user.id)
+            child.save()
+            callback = 'Категории добалены!'
+        messages.success(request, callback)
+        return HttpResponseRedirect('/personal/')
+    else:
+        parent_note = request.user.category_set.filter(parent_category_id__isnull=True)
+    return render(request, 'notes/personal/categories.html', {'parent_note': parent_note})
+
+
+@login_required(login_url='/auth/login/')
+def personal_categories_delete(request, category_id):
+    try:
+        category = request.user.category_set.get(id=category_id)
+    except:
+        raise Exception('Вы пытаетесь редактировать заметку другому пользователю?')
+    category.delete()
+    return HttpResponseRedirect('/personal/')

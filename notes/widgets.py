@@ -34,7 +34,7 @@ class MyWidgetForLabels(SelectMultiple):
                 selected_choices.remove(option_value)
         else:
             selected_html = ''
-        return format_html('<option data-img-src="/static/notes/labels/{}" value="{}"{}>{}</option>',
+        return format_html('<option data-img-src="/static/notes/labels/default/{}" value="{}"{}>{}</option>',
                            force_text(option_label),
                            option_value,
                            selected_html,
