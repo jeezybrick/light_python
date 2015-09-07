@@ -2,15 +2,15 @@
 {% load bootstrap3 %}
 {% load staticfiles %}
 {% block title %}
-    {{ foo }} заметку
+    Добавить ярлык
 {% endblock %}
 
 {% block content %}
-        <h1>{{ foo }} заметку</h1>
+        <h1>Добавить ярлык</h1>
         <ol class="breadcrumb">
             <li><a href="{% url 'home' %}">Главная</a></li>
             <li><a href="{% url 'user_notes' request.user.username %}">Мои заметки</a></li>
-            <li class="active">{{ foo }} заметку</li>
+            <li class="active">Добавить ярлык</li>
         </ol>
         <hr>
         <div class="col-md-8 col-sm-10">
@@ -32,8 +32,8 @@
 
                 {% bootstrap_form form layout='horizontal' size='medium' horizontal_label_class='col-md-2' horizontal_field_class='col-md-7' %}
                 <div class="form-group">
-                    <div class="col-md-6 col-md-offset-2 text-center">
-                        <input type="submit" class="btn btn-primary" name="submit" value="{{ foo }} заметку">
+                    <div class="col-md-6 col-md-offset-1 text-center">
+                        <input type="submit" class="btn btn-primary" name="submit" value="Добавить ярлык">
                     </div>
                 </div>
             </form>

@@ -40,7 +40,7 @@
 
                 {% else %}
                     <ul class="nav navbar-nav hidden-lg hidden-md hidden-sm pull-right" style="margin-right: 20px;">
-                    <li><a href="#">Войти</a>
+                    <li><a href="{% url 'login' %}">Войти</a>
                         </li>
                     </ul>
 
@@ -48,7 +48,7 @@
                 {% if user.is_authenticated %}
                     <div class="pull-right hidden-lg hidden-md hidden-sm"
                          style="padding:0;margin-right: 10px;height: 50px;width: 80px;">
-                        <img src="#" width="100%" height="100%"
+                        <img src="{% static request.user.avatar|default:"notes/avatars/avatar-default.png" %}" width="100%" height="100%"
                              alt="Avatar">
                     </div>
                 {% endif %}
@@ -78,7 +78,7 @@
                 <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                         <li class="hidden-xs" style="width: 70px;height: 50px;margin-right: 5px;">
-                            <img src="#" width="100%"
+                            <img src="{% static request.user.avatar|default:"notes/avatars/avatar-default.png" %}" width="100%"
                                  height="100%" alt="Avatar">
                         </li>
                         <li><a href="{% url 'user_show' request.user.username %}">
@@ -100,7 +100,7 @@
         <!--/.container-fluid -->
     </nav>
 </div>
-    <div class="container main-content" ng-app="testApp" style="margin-bottom: 80px;">
+    <div class="container main-content" ng-app="myApp" style="margin-bottom: 80px;">
     {# Комментарий #}
         {% block content %}
             {# Контент #}
@@ -117,14 +117,38 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="{% static 'notes/bower_components/angular/angular.min.js' %}"></script>
+    <script src="{% static 'notes/js/my_ang.js' %}"></script>
     <script src="{% static 'notes/js/image-picker.min.js' %}"></script>
 
 <script>
-    $('.notes').mouseenter(function(){
-        $(this).removeClass('animated bounceInDown').addClass('animated rubberBand');
-    }).mouseleave(function(){
-      // $(this).removeClass('animated bounceInDown')
+    $(document).ready(function(){
+        $('.notes').mouseenter(function(){
+            $(this).removeClass('animated bounceInDown').addClass('animated pulse');
+            $(this).click(function(){
+                $(this).removeClass('animated pulse').addClass('animated flip');
+            });
+        }).mouseleave(function(){
+           $(this).removeClass('animated pulse')
+        });
+
+        $('.notes_labels').mouseenter(function(){
+            $(this).css("overflow","visible");
+        }).mouseleave(function(){
+            $(this).css("overflow","hidden");
+        });
+
+        $('.labels_in_show').click(function(){
+           // $(this).addClass('animated zoomOutUp');
+            var hidden = $(this).addClass('animated zoomOutUp');
+            setTimeout(function() {
+                hidden.addClass('hidden');
+            }, 1000);
+        });
+
+        $('.messenger').delay(2000).slideUp();
     });
+
 </script>
 
 <script>

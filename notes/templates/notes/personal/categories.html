@@ -15,11 +15,19 @@
                     <li class="active">Категории</li>
         </ol>
         <hr>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="messenger alert alert-success" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-controller="categoryCtrl">
         {# Блок для Andular #}
             {% verbatim %}
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-show = 'empty'  ng-class="{'animated fadeInDown':clear_not}">
                         <span class="help-block" ng-hide="empty">
                                      Если вы хотите добавить еще категорий,подтвердите текущий свой выбор.</span>
                         <div class="form-group">
@@ -33,9 +41,11 @@
                         </div>
                         <button ng-click="addCategory()" class="btn btn-info"
                                 ng-disabled = '!cat.parent || !empty'>Добавить</button>
+
+
                     </div>
                     {% endverbatim %}
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <h2 style="margin-top: 0;">
                         {% if parent_note %}
                             Ваши текущие категории
@@ -49,7 +59,7 @@
                              <ul>
                                 <li>
                                     {{ p_note }} <a href="{% url 'personal_categories_delete'  p_note.id %}"
-                                        onclick="return confirm('Удаление родительской категории повличет за собой удаление всех ее подкатегорий!')">Удалить</a>
+                                        onclick="return confirm('Удаление родительской категории также удаляет и ее подкатегорий!')">Удалить</a>
                                     {% for sub_note in p_note.category_set.all %}
                                     <ul>
                                         <li>
@@ -62,7 +72,7 @@
                         {% endfor %}
                     {% verbatim %}
                     <h2 ng-hide="empty">Будут добавлены</h2>
-                        <ul ng-repeat="category in categories">
+                        <ul ng-repeat="category in categories" ng-class="{'animated tada':!empty}">
                             <li>
                                 {{ category.parent }} <a href="" ng-click="removeName(category.parent)">remove</a>
                                 <input class="hidden" name="parent" type="text" value="{{ category.parent }}" />
@@ -76,6 +86,8 @@
                             </li>
                         </ul>
                         <button class="btn btn-warning" ng-hide = 'empty'>Хорошо,добавить!</button>
+                    <button ng-click="clear()" class="btn btn-default"
+                                ng-disabled = 'cat.parent || empty' ng-hide = 'empty'>Очистить</button>
                     </form>
                     </div>
                 </div>

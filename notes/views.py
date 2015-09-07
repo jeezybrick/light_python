@@ -1,11 +1,10 @@
-from django.shortcuts import render, get_object_or_404, render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
-from .models import MyUser, Notes, ColorOfNote, Category
-from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm, AddCategory
-from PIL import Image
+from .models import MyUser, Notes, Category, LabelCustom
+from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm
 
 
 def home(request):
@@ -94,8 +93,7 @@ def user_notes_modify(request, username, note_id=None):
         note = None
         foo = 'Добавить'
     if request.method == 'POST':
-        print(request.POST)
-        form = ModifyNoteForm(request.POST, request.FILES, instance=note)
+        form = ModifyNoteForm(request.user, request.POST, request.FILES, instance=note)
         if form.is_valid():
             first = form.save(commit=False)
             first.user = request.user
@@ -104,7 +102,7 @@ def user_notes_modify(request, username, note_id=None):
             return HttpResponseRedirect('/users/'+username+'/notes/'+str(first.id)+'/')
         return render(request, 'notes/notes/modify.html', {'form': form, 'note': note})
     else:
-        form = ModifyNoteForm(instance=note)
+        form = ModifyNoteForm(instance=note, user=request.user)
 
     return render(request, 'notes/notes/modify.html', {'note': note, 'form': form,
                                                        'foo': foo})
@@ -148,10 +146,23 @@ def user_notes_labels_add(request, username, note_id):
             first = form.save(commit=False)
             first.note = note
             first.save()
-            return HttpResponseRedirect('/users/'+request.user.username+'/notes/')
+            messages.success(request, 'Ярлык добавлен!')
+            return HttpResponseRedirect('/users/'+request.user.username+'/notes/'+note_id+'/')
     else:
         form = AddLabelForm()
     return render(request, 'notes/labels/add.html', {'form': form})
+
+
+@login_required(login_url='/auth/login/')
+def user_notes_labels_delete(request, username, note_id, label_id):
+    try:
+        note = request.user.notes_set.get(id=note_id)
+    except:
+        raise Exception('Вы пытаетесь удалить значок другого пользователя?')
+    label = get_object_or_404(LabelCustom, id=label_id)
+    label.delete()
+    messages.success(request, 'Ярлык удален!')
+    return HttpResponseRedirect('/users/'+request.user.username+'/notes/'+note_id+'/')
 
 
 @login_required(login_url='/auth/login/')
@@ -196,4 +207,5 @@ def personal_categories_delete(request, category_id):
     except:
         raise Exception('Вы пытаетесь редактировать заметку другому пользователю?')
     category.delete()
-    return HttpResponseRedirect('/personal/')
+    messages.success(request, 'Категория удалена!')
+    return HttpResponseRedirect('/personal/categories/')

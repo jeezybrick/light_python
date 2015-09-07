@@ -18,13 +18,12 @@
                 </ol>
                 <hr>
                 <div class="col-lg-4 col-md-5 col-sm-6 col-xs-6">
-                    {% if avatar_exist %}
-                        <a href="{% static 'blog/img/avatars/' %}{{ request.user.id }}.jpg">
-                            <img src="{% static 'blog/img/avatars/' %}{{ request.user.id }}.jpg"
+                    {% if request.user.avatar %}
+                        <a href="{% static request.user.avatar %}">
+                            <img src="{% static request.user.avatar %}"
                                  class="img-rounded img-responsive" alt="Avatar">
 
                         </a>
-                        <h4 class="text-center">Размер аватарки {{ avatar_size | filesizeformat  }}.</h4>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" style="margin-top:20px;">
                         <h4>Вы также можете <a href="#"> обрезать изображение</a>.</h4>
                     </div>

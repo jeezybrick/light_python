@@ -9,20 +9,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
-from .models import Notes, MyUser, Category
+from .models import Notes, MyUser, Category, LabelCustom
 from .widgets import MyWidgetForColor, MyWidgetForLabels
-MEDIA_CHOICES = (
-        ('Audio', (
-            ('vinyl', 'Vinyl'),
-            ('cd', 'CD'),
-        )
-         ),
-        ('Video', (
-            ('vhs', 'VHS Tape'),
-            ('dvd', 'DVD'),
-        )
-         ),
-)
+
 
 class MyLoginForm(AuthenticationForm):
 
@@ -37,6 +26,7 @@ class MyLoginForm(AuthenticationForm):
 
 
 class MyRegForm(UserCreationForm):
+    form_name = 'reg_form'
     error_messages = {
         'password_mismatch': "Пароли не совпадают!",
     }
@@ -69,7 +59,7 @@ class MyRegForm(UserCreationForm):
                                                           'Введите телефон в правильном формате!(***-*******)',
                                                           'invalid'), ])
     date_of_birth = forms.DateField(label='Дата рождения', required=True,
-                                    widget=SelectDateWidget(empty_label="Nothing"),
+                                    widget=SelectDateWidget(years=range(2015, 1940, -1)),
                                     error_messages={'invalid': 'Неверный формат даты'})
 
     class Meta:
@@ -85,32 +75,39 @@ class MyRegForm(UserCreationForm):
         return user
 
 
-def categories_as_choices():
-    categories = []
-    for category in Category.objects.filter(parent_category_id__isnull=True):
-        new_category = []
-        sub_categories = []
-        for sub_category in category.category_set.all():
-            sub_categories.append([sub_category.id, sub_category.name])
+def categories_as_choices(user):
+        categories = []
+        for category in user.category_set.filter(parent_category_id__isnull=True):
+            new_category = []
+            sub_categories = []
+            for sub_category in category.category_set.all():
+                sub_categories.append([sub_category.id, sub_category.name])
 
-        new_category = [category.name, sub_categories]
-        categories.append(new_category)
+            new_category = [category.name, sub_categories]
+            categories.append(new_category)
 
-    return categories
+        return categories
 
 
 class ModifyNoteForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
         super(ModifyNoteForm, self).__init__(*args, **kwargs)
+        self.fields['categories'].choices = categories_as_choices(self.user)
+        self.fields['categories'].label = 'Категории'
+        self.fields['labels'].label = 'Ярлыки'
+        self.fields['color'].label = 'Цвет заметки'
+        self.fields['categories'].help_text = '<a href="/personal/categories/">Щелкните чтобы добавить категории</a>.<br />' \
+                                              'Для выбора нескольких категорий зажмите клавишу Ctrl.'
 
     message = forms.CharField(label='Текст', widget=forms.Textarea(attrs={'cols': 20, 'rows': 5}))
-    categories = forms.MultipleChoiceField(required=False,
-                                           choices=categories_as_choices())
+    categories = forms.MultipleChoiceField(required=False)
+    file = forms.FileField(label='Прикрепить файл', required=False)
 
     class Meta:
         model = Notes
-        fields = ('title', 'message', 'color', 'categories', 'labels', )
+        fields = ('title', 'message', 'color', 'categories', 'labels', 'file', )
         widgets = {
             # 'categories': forms.CheckboxSelectMultiple(attrs={'class': 'lal'}),
             'labels': MyWidgetForLabels(attrs={'class': 'label_picker'}),
@@ -121,9 +118,26 @@ class ModifyNoteForm(forms.ModelForm):
 class EditProfileForm(forms.ModelForm):
 
     date_of_birth = forms.DateField(label='Дата рождения', required=True,
-                                    widget=SelectDateWidget(empty_label="Nothing"))
+                                    widget=SelectDateWidget(years=range(2015, 1940, -1)))
 
     class Meta:
         model = MyUser
         fields = ('last_name', 'first_name', 'username', 'email', 'date_of_birth', 'phone', 'is_private', )
         exclude = ('password',)
+
+
+class EditAvatarForm(forms.ModelForm):
+
+    avatar = forms.ImageField(label='Загрузить аватарку')
+
+    class Meta:
+        model = MyUser
+        fields = ('avatar', )
+
+
+class AddLabelForm(forms.ModelForm):
+    file = forms.ImageField(label='Добавить значки')
+
+    class Meta:
+        model = LabelCustom
+        fields = ('file', )

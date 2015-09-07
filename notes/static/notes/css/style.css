@@ -1,13 +1,27 @@
-.main-content{
+.main-content {
     /*margin-top: 80px;*/
 }
+
 #avatar_on_index {
     padding-bottom: 10px;
     padding-left: 0;
     border-right: dotted 1px #808080;
     border-bottom: dotted 1px #808080;
 }
-.user_info_block{
+
+.user_info_block {
     border-bottom: dashed 1px green;
     padding: 0;
+}
+
+.notes {
+    padding: 10px;
+    min-height: 240px;
+    border: 1px dotted #808080;
+    cursor: pointer;
+}
+
+.image_picker_image{
+    width: 48px;
+    height: 48px;
 }

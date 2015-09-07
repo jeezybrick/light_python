@@ -105,6 +105,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR,  'templates'),
+    os.path.join(BASE_DIR,  'notes/templates'),
 )
 AUTH_USER_MODEL = 'notes.MyUser'
+
+MEDIA_ROOT = 'notes/static/'

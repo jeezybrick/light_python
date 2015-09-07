@@ -44,4 +44,7 @@ urlpatterns = [
     url(r"^users/(?P<username>\w+)/notes/(?P<note_id>[0-9]+)/labels/add/$",
         'notes.views.user_notes_labels_add',
         name='user_notes_labels_add'),
+    url(r"^users/(?P<username>\w+)/notes/(?P<note_id>[0-9]+)/labels/(?P<label_id>[0-9]+)/delete/$",
+        'notes.views.user_notes_labels_delete',
+        name='user_notes_labels_delete'),
 ]
