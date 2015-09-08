@@ -6,56 +6,55 @@
 {% endblock %}
 
 {% block content %}
-    {% if user.is_authenticated %}
 
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-bottom: 70px;">
-                <h1>Загрузка аватара</h1>
-                <ol class="breadcrumb">
-                    <li><a href="{% url 'home' %}">Главная</a></li>
-                    <li><a href="{% url 'personal_show' %}">Личный кабинет</a></li>
-                    <li class="active">Загрузка аватара</li>
-                </ol>
-                <hr>
-                <div class="col-lg-4 col-md-5 col-sm-6 col-xs-6">
-                    {% if request.user.avatar %}
-                        <a href="{% static request.user.avatar %}">
-                            <img src="{% static request.user.avatar %}"
-                                 class="img-rounded img-responsive" alt="Avatar">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <h1>Загрузка аватара</h1>
+            <ol class="breadcrumb">
+                <li><a href="{% url 'home' %}">Главная</a></li>
+                <li><a href="{% url 'personal_show' %}">Личный кабинет</a></li>
+                <li class="active">Загрузка аватара</li>
+            </ol>
+            <hr>
+            <div class="col-lg-4 col-md-5 col-sm-6 col-xs-6">
+                {% if request.user.avatar %}
+                    <a href="{% static request.user.avatar %}">
+                        <img src="{% static request.user.avatar %}"
+                             class="img-rounded img-responsive" alt="Avatar">
 
-                        </a>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" style="margin-top:20px;">
+                    </a>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" style="margin-top:20px;">
                         <h4>Вы также можете <a href="#"> обрезать изображение</a>.</h4>
                     </div>
-                    {% else %}
-                       <h3>Вы еще не загружали аватар</h3>
-                    {% endif %}
-                </div>
+                {% else %}
+                    <h3>Вы еще не загружали аватар</h3>
+                {% endif %}
+            </div>
 
-                <div class="col-lg-8 col-md-7 col-sm-6 col-xs-6">
-                    <form class="form-horizontal" role="form" method="POST" action="#"
-                          enctype="multipart/form-data">
-                        {% csrf_token %}
-                        {% if form.errors %}
-                            <div class="col-md-12">
-                                <div class="panel-body">
-                                    <div class="alert alert-danger">
-                                        <ul>
-                                            {{ form.errors }}
-                                        </ul>
-                                    </div>
+            <div class="col-lg-8 col-md-7 col-sm-6 col-xs-6">
+                <form class="form-horizontal" role="form" method="POST" action="#"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="col-md-12">
+                            <div class="panel-body">
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        {{ form.errors }}
+                                    </ul>
                                 </div>
                             </div>
-                        {% endif %}
-                        <div class="form-group">
-                            <label class="col-md-2 control-label">Загрузить аватар</label>
-
-                            <div class="col-md-6" style="margin-top: 20px;">
-                                {{ form.avatar }}
-                            </div>
                         </div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">Загрузить аватар</label>
 
-                        <!--<div class="form-group">
+                        <div class="col-md-6" style="margin-top: 20px;">
+                            {{ form.avatar }}
+                        </div>
+                    </div>
+
+                    <!--<div class="form-group">
                             <label class="col-md-2 control-label">Сделать черно-белым</label>
 
                             <div class="col-md-6" style="margin-top: 20px;">
@@ -86,16 +85,14 @@
                             </div>
                         </div>
 -->
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-2 text-center">
-                                <input type="submit" class="btn btn-primary btn-lg" name="submit" value="Загрузить">
-                            </div>
+                    <div class="form-group">
+                        <div class="col-md-6 col-md-offset-2 text-center">
+                            <input type="submit" class="btn btn-primary btn-lg" name="submit" value="Загрузить">
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
-    {% else %}
-        <h1 class="text-center">Вы не вошли на сайт!</h1>
-    {% endif %}
+    </div>
+
 {% endblock %}

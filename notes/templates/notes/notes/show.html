@@ -6,23 +6,27 @@
 
 {% block content %}
     <div class="row">
-            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12" style="word-break: break-all;">
-                <h1 style="margin-top: 0;">{{ note.title }}</h1>
-            </div>
+        <div class="col-lg-10 col-md-9 col-sm-9 col-xs-12" style="word-break: break-all;">
+            <h1 style="margin-top: 0;">{{ note.title }}</h1>
+        </div>
 
-            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12 text-right">
-                {% if request.user.username == note.user.username %}
-                    <a href="{% url 'user_notes_edit' request.user.username note.id %}" class="btn btn-info" style="margin-top: 10px;">Редактировать</a>
-                    <form action="{% url 'user_notes_delete' request.user.username note.id%}" method="post" style="margin: 10px 0 0 0;">
+        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-12 text-right">
+            {% if request.user.username == note.user.username %}
+                <a href="{% url 'user_notes_edit' request.user.username note.id %}" class="btn btn-info"
+                   style="margin-top: 10px;">Редактировать</a>
+                <form action="{% url 'user_notes_delete' request.user.username note.id %}" method="post"
+                      style="margin: 10px 0 0 0;">
                     {% csrf_token %}
                     <button class="btn btn-danger" type="submit"
-                            onclick="return confirm('Вы уверены,что хотите удалить эту заметку?')">Удалить заметку</button>
-                    </form>
-                {% else %}
-                    <a href="{% url 'user_notes'  request.user.username %}" class="btn btn-info" style="margin-top: 10px;">Посмотреть мои заметки</a>
-                {% endif %}
-            </div>
-            <div class="col-lg-12 col-md--12 col-sm-12 col-xs-12">
+                            onclick="return confirm('Вы уверены,что хотите удалить эту заметку?')">Удалить заметку
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'user_notes'  request.user.username %}" class="btn btn-info" style="margin-top: 10px;">Посмотреть <br />
+                    мои заметки</a>
+            {% endif %}
+        </div>
+        <div class="col-lg-12 col-md--12 col-sm-12 col-xs-12">
             {% if messages %}
                 {% for message in messages %}
                     <div class="messenger alert alert-success" role="alert">
@@ -31,51 +35,59 @@
                     </div>
                 {% endfor %}
             {% endif %}
-                <h3 style="margin: 0;">
-                    <small>Автор:<a href="{% url 'user_show' note.user.username%}">{{ note.user.username }}</a></small>
-                </h3>
-                <pre>{{ note.message }}</pre>
+            <h3 style="margin: 0;">
+                <small>Автор:<a href="{% url 'user_show' note.user.username %}">{{ note.user.username }}</a></small>
+            </h3>
+            <pre>{{ note.message }}</pre>
 
-                <h3><a href="{% url 'personal_categories' %}">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    </a>
-                    Категории:
-                 {%for category in note.categories.all %}
+            <h3><a href="{% url 'personal_categories' %}">
+                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </a>
+                Категории:
+                {% for category in note.categories.all %}
                     <small>{{ category }}</small>
-                 {%empty%}
-                     <small>Категории не выбраны.</small>
-                 {%endfor%}
-                </h3>
-                <hr/>
-                <h3><a href="{% url 'user_notes_labels_add'  request.user.username note.id %}">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    </a>
-                    Ярлыки: <br/><small>Нажмите на значок ,чтобы удалить его</small>
-                {% for label in note.labels.all %}
-                    <img class="labels_in_show" src="{% static 'notes/labels/default/' %}{{ label }}" alt="Label" width="96" height="96">
                 {% empty %}
-                     <small>Ярлыки не выбраны.</small>
+                    <small>Категории не выбраны.</small>
+                {% endfor %}
+            </h3>
+            <hr/>
+            <h3><a href="{% url 'user_notes_labels_add'  request.user.username note.id %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </a>
+                Ярлыки: <br/>
+                <small>Нажмите на значок ,чтобы удалить его</small>
+                {% for label in note.labels.all %}
+                    <img class="labels_in_show" src="{% static 'notes/labels/default/' %}{{ label }}" alt="Label"
+                         width="96" height="96">
+                {% empty %}
+                    <small>Ярлыки не выбраны.</small>
                 {% endfor %}
 
                 {% for label in note.labelcustom_set.all %}
-                    <a href="{% url 'user_notes_labels_delete'  request.user.username note.id label.id %}"><img class="labels_in_show" src="{% static '' %}{{ label }}" alt="Label" width="96" height="96"></a>
+                    <a href="{% url 'user_notes_labels_delete'  request.user.username note.id label.id %}"><img
+                            class="labels_in_show" src="{% static '' %}{{ label }}" alt="Label" width="96" height="96"></a>
                 {% empty %}
-                     <small>Добавьте ваши собственные ярлыки.</small>
+                    <small>Добавьте ваши собственные ярлыки.</small>
                 {% endfor %}
-                </h3>
-                <hr/>
-                <div class="row">
-                    <div class="col-md-1 col-sm-2 col-xs-3">
-                        <h3>Цвет:</h3>
-                    </div>
-                    <div class="col-md-2 col-sm-2 col-xs-7" style="min-height:50px;background-color: {{ note.color.color }}">
-                    </div>
+            </h3>
+            <hr/>
+            <div class="row">
+                <div class="col-md-1 col-sm-2 col-xs-3">
+                    <h3>Цвет:</h3>
                 </div>
-                <hr/>
-                <h3>Файл: <a href="{% static note.file %}"><small>{{ note.file|default:"Отсутствует" }}</small></a></h3>
-                <hr/>
-                <h3>Дата добавления:<small>{{ note.created_at }}</small></h3>
+                <div class="notes-show-color-block col-md-2 col-sm-2 col-xs-7"
+                     style="background-color: {{ note.color.color }}">
+                </div>
             </div>
+            <hr/>
+            <h3>Файл: <a href="{% static note.file %}">
+                <small>{{ note.file|default:"Отсутствует" }}</small>
+            </a></h3>
+            <hr/>
+            <h3>Дата добавления:
+                <small>{{ note.created_at }}</small>
+            </h3>
+        </div>
         <hr>
     </div>
 

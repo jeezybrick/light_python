@@ -1,80 +1,82 @@
 {% extends 'notes/layout.html' %}
 {% load staticfiles %}
 {% block title %}
-Мои заметки
+    Мои заметки
 {% endblock %}
 
-{%  block content %}
-   {% if user.is_authenticated %}
-       {% if user_owner|slugify == request.user.username|slugify or not user_owner.is_private %}
-           <div class="row">
-               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                   <div class="row">
-                       <div class="col-lg-6 col-md-9 col-sm-9 col-xs-12">
-                            <h1>Заметки пользователя {{ user_owner }}</h1>
-                        </div>
-                        <div class="col-lg-6 col-md-3 col-sm-3 col-xs-12" style="margin-top: 25px;">
-                            <a href="{% url 'user_notes_add' request.user.username %}" class="btn btn-warning pull-right">Добавить заметку</a>
-                        </div>
-                   </div>
-               </div>
-           </div>
-            <ol class="breadcrumb">
-                    <li><a href="{% url 'home' %}">Главная</a></li>
-                    <li class="active">Заметки</li>
-                </ol>
-            <hr>
-           <div class="row">
-           {% for note in notes %}
-               <a href="{% url 'user_notes_show' user_owner.username note.id %}">
-                   <div class="lal col-lg-4 col-ms-4 col-sm-6 col-xs-12" style="margin-bottom: 20px;padding: 0 10px;">
+{% block content %}
+    {% if user_owner|slugify == request.user.username|slugify or not user_owner.is_private %}
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="row">
+                    <div class="col-lg-6 col-md-9 col-sm-9 col-xs-12">
+                        <h1>Заметки пользователя {{ user_owner }}</h1>
+                    </div>
+                    <div class="col-lg-6 col-md-3 col-sm-3 col-xs-12" style="margin-top: 25px;">
+                        <a href="{% url 'user_notes_add' request.user.username %}"
+                           class="btn btn-warning pull-right">Добавить заметку</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li class="active">Заметки</li>
+        </ol>
+        <hr>
+        <div class="row">
+            {% for note in notes %}
+                <a href="{% url 'user_notes_show' user_owner.username note.id %}">
+                    <div class="lal col-lg-4 col-ms-4 col-sm-6 col-xs-12"
+                         style="margin-bottom: 20px;padding: 0 10px;">
 
-                       <div class="notes text-center animated bounceInDown" style="background-color: {{ note.color.color }};">
-                           {# onclick="window.location='{% url 'user_notes_show' user_owner.username note.id %}';" #}
-                           <div class="row">
-                               <div class="notes_labels col-lg-12 col-md-12 col-sm-12 col-xs-12" style="height: 48px;overflow: hidden;">
-                                   {% for label in note.labels.all %}
-                                       <img src="{% static 'notes/labels/default/' %}{{ label }}" alt="Label" width="48" height="48">
-                                   {% empty %}
-                                       <img src="{% static 'notes/labels/default/calendar.png' %}" alt="Label" width="48" height="48">
-                                   {% endfor %}
-                                   {% for label in note.labelcustom_set.all %}
-                                       <img src="{% static '' %}{{ label }}" alt="Label" width="48" height="48">
-                                   {% endfor %}
-                               </div>
-                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                   <h4 style="word-break: break-all;">{{ note.title|truncatechars:35 }}</h4>
-                               </div>
-                           </div>
-                           <pre>{{ note.message|truncatechars:180 }}</pre>
-                       </div>
-                   </div>
-               </a>
+                        <div class="notes text-center animated bounceInDown"
+                             style="background-color: {{ note.color.color }};">
+                            {# onclick="window.location='{% url 'user_notes_show' user_owner.username note.id %}';" #}
+                            <div class="row">
+                                <div class="notes_labels col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                                     style="height: 48px;overflow: hidden;">
+                                    {% for label in note.labels.all %}
+                                        <img src="{% static 'notes/labels/default/' %}{{ label }}" alt="Label"
+                                             width="48" height="48">
+                                    {% empty %}
+                                        <img src="{% static 'notes/labels/default/calendar.png' %}" alt="Label"
+                                             width="48" height="48">
+                                    {% endfor %}
+                                    {% for label in note.labelcustom_set.all %}
+                                        <img src="{% static '' %}{{ label }}" alt="Label" width="48" height="48">
+                                    {% endfor %}
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <h4 style="word-break: break-all;">{{ note.title|truncatechars:35 }}</h4>
+                                </div>
+                            </div>
+                            <pre>{{ note.message|truncatechars:180 }}</pre>
+                        </div>
+                    </div>
+                </a>
             {% empty %}
-               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-               <h3>
-                    Вы еще не создавали заметок!
-                    <a href="{% url 'user_notes_add' request.user.username %}">Создайте заметку прямо сейчас.</a>
-                </h3>
-               </div>
-
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h3>
+                        Вы еще не создавали заметок!
+                        <a href="{% url 'user_notes_add' request.user.username %}">Создайте заметку прямо
+                            сейчас.</a>
+                    </h3>
+                </div>
             {% endfor %}
-           </div>
-           <nav>
-               <ul class="pager">
-                   {% if notes.has_previous %}
-                       <li><a href="?page={{ notes.previous_page_number }}">Previous</a></li>
-                   {% endif %}
-                   {% if notes.has_next %}
-                          <li><a href="?page={{ notes.next_page_number }}">Next</a></li>
-                   {% endif %}
-               </ul>
-            </nav>
-            {% else %}
-            <h1 class="text-center">Этот пользователь закрыл свои заметки.</h1>
-            {% endif %}
-   {% else %}
-    <h1 class="text-center">Вы не вошли на сайт!</h1>
+        </div>
+        <nav>
+            <ul class="pager">
+                {% if notes.has_previous %}
+                    <li><a href="?page={{ notes.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                {% if notes.has_next %}
+                    <li><a href="?page={{ notes.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <h1 class="text-center">Этот пользователь закрыл свои заметки.</h1>
     {% endif %}
 
 {% endblock %}

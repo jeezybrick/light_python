@@ -1,40 +1,41 @@
 {% extends 'notes/layout.html' %}
-{%  block title %}
-Список пользователей
+{% block title %}
+    Список пользователей
 {% endblock %}
 
-{%  block content %}
-           <div class="row">
-               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                  <h1>Список пользователей</h1>
-               </div>
-           </div>
-            <ol class="breadcrumb">
-                    <li><a href="{% url 'home' %}">Главная</a></li>
-                    <li class="active">Список пользователей</li>
-                </ol>
-            <hr>
-       {% for user in users_list %}
-           <div class="col-lg-12 col-ms-12 col-sm-12 col-xs-12" style="background-color: {{ note.color.color }};margin-bottom: 20px;">
-               <h4>
-                   <a href="{%  url 'user_show' user.username %}">{{ user.username }}</a>
-                   {% if user.is_private %}
-                        <small> Заметки скрыты</small>
-                   {% endif %}
-               </h4>
-                <pre>{{ user.email }}</pre>
-           </div>
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <h1>Список пользователей</h1>
+        </div>
+    </div>
+    <ol class="breadcrumb">
+        <li><a href="{% url 'home' %}">Главная</a></li>
+        <li class="active">Список пользователей</li>
+    </ol>
+    <hr>
+    {% for user in users_list %}
+        <div class="col-lg-12 col-ms-12 col-sm-12 col-xs-12"
+             style="background-color: {{ note.color.color }};margin-bottom: 20px;">
+            <h4>
+                <a href="{% url 'user_show' user.username %}">{{ user.username }}</a>
+                {% if user.is_private %}
+                    <small> Заметки скрыты</small>
+                {% endif %}
+            </h4>
+            <pre>{{ user.email }}</pre>
+        </div>
     {% empty %}
         <h4>Пользователи отсутствуют:(</h4>
     {% endfor %}
-       <nav>
-               <ul class="pager">
-                   {% if users_list.has_previous %}
-                       <li><a href="?page={{ users_list.previous_page_number }}">Previous</a></li>
-                   {% endif %}
-                   {% if users_list.has_next %}
-                          <li><a href="?page={{ users_list.next_page_number }}">Next</a></li>
-                   {% endif %}
-               </ul>
-       </nav>
+    <nav>
+        <ul class="pager">
+            {% if users_list.has_previous %}
+                <li><a href="?page={{ users_list.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            {% if users_list.has_next %}
+                <li><a href="?page={{ users_list.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

@@ -1,5 +1,5 @@
 .main-content {
-    /*margin-top: 80px;*/
+    margin-bottom: 80px;
 }
 
 #avatar_on_index {
@@ -24,4 +24,31 @@
 .image_picker_image{
     width: 48px;
     height: 48px;
+}
+.navbar-toggle{
+margin-left:15px;
+}
+
+#login_nav {
+     margin: 0 15px 0 0;
+}
+
+.nav_avatar{
+    width: 70px;height: 50px;margin-right: 5px;
+}
+
+.nav_avatar_xs{
+    padding:0;margin-right: 10px;height: 50px;width: 80px;
+}
+.navbar-fixed-bottom{
+    min-height: 50px;padding: 0;
+}
+.footer-text{
+margin: 20px;
+}
+.footer-text>a{
+float: none;
+}
+.notes-show-color-block{
+    min-height:50px;
 }

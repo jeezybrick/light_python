@@ -1,15 +1,15 @@
 {% extends 'notes/layout.html' %}
 {% load humanize %}
-{%  block title %}
-Личный кабинет
+{% block title %}
+    Личный кабинет
 {% endblock %}
 
-{%  block content %}
-<div class="row">
+{% block content %}
+    <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <h1>Личный кабинет</h1>
             <ol class="breadcrumb">
-                <li><a href="{% url 'home'%}">Главная</a></li>
+                <li><a href="{% url 'home' %}">Главная</a></li>
                 <li class="active">Личный кабинет</li>
             </ol>
             <hr>
@@ -22,14 +22,16 @@
                 {% endfor %}
             {% endif %}
             <h1>
-                <small>Привет,{{ user.username }} ! Ваш профиль был создан {{user.date_joined | naturaltime }}.<br>
-                Последний раз вы логинились на сайт {{ user.last_login | naturaltime  }}.</small>
+                <small>Привет,{{ user.username }} ! Ваш профиль был создан {{ user.date_joined | naturaltime }}.<br>
+                    Последний раз вы логинились на сайт {{ user.last_login | naturaltime }}.
+                </small>
             </h1>
             <div class="list-group col-lg-3 col-md-4 col-sm-5">
                 <a href="{% url 'personal_edit' %}" class="list-group-item">Редактировать личные данные</a>
                 <a href="{% url 'personal_edit_avatar' %}" class="list-group-item">Изменить аватар</a>
                 <a href="{% url 'user_notes' request.user.username %}" class="list-group-item">Ваши заметки</a>
-                <a href="{% url 'personal_categories' %}" class="list-group-item list-group-item-info">Добавить категории</a>
+                <a href="{% url 'personal_categories' %}" class="list-group-item list-group-item-info">Добавить
+                    категории</a>
             </div>
         </div>
     </div>
