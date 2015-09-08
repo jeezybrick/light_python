@@ -12,7 +12,7 @@ urlpatterns = [
             'authentication_form': MyLoginForm,
             'extra_context':
             {
-                'title': 'Log in',
+                'title': 'Вход пользователя',
             }
         },
         name='login'),
