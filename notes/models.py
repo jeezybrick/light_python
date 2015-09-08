@@ -16,6 +16,7 @@ class OverwriteStorage(FileSystemStorage):
         return name
 
 
+# Расширенная модель пользователя
 class MyUser(AbstractUser):
     date_of_birth = models.DateField(default=datetime.datetime.now)
     phone = models.CharField(_('Телефон'), max_length=40, default='', blank=False, null=False)
@@ -32,6 +33,7 @@ class MyUser(AbstractUser):
         unique_together = ('email',)
 
 
+# Модель цыета заметок
 class ColorOfNote(models.Model):
     name = models.CharField(_("Цвет заметки"), max_length=30, blank=True)
     color = models.CharField(_("Цвет в hex"), max_length=30, blank=True)
@@ -40,6 +42,7 @@ class ColorOfNote(models.Model):
         return self.name
 
 
+# Категории
 class Category(models.Model):
     name = models.CharField(max_length=50)
     parent_category = models.ForeignKey("self", blank=True, null=True)
@@ -49,6 +52,7 @@ class Category(models.Model):
         return self.name
 
 
+# Стандартные ярлыки
 class LabelDefault(models.Model):
     name = models.CharField(max_length=100)
 
@@ -56,6 +60,7 @@ class LabelDefault(models.Model):
         return self.name
 
 
+# Заметки
 class Notes(models.Model):
     title = models.CharField(_('Название'), max_length=50, blank=False)
     message = models.CharField(_("Текст"), max_length=1000, blank=False)
@@ -71,6 +76,7 @@ class Notes(models.Model):
         return self.message
 
 
+# Ярлыки пользователя
 class LabelCustom(models.Model):
     file = models.ImageField(upload_to='notes/labels/custom/', blank=True)
     note = models.ForeignKey(Notes, blank=True, null=True)

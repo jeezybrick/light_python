@@ -9,10 +9,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
-from .models import Notes, MyUser, Category, LabelCustom
+from .models import Notes, MyUser, LabelCustom
 from .widgets import MyWidgetForColor, MyWidgetForLabels
 
 
+# Форма для авторизации
 class MyLoginForm(AuthenticationForm):
 
     username = forms.CharField(label='Логин', max_length=254,
@@ -25,6 +26,7 @@ class MyLoginForm(AuthenticationForm):
                                    'placeholder': 'Введите ваш пароль'}))
 
 
+# Форма для регистрации
 class MyRegForm(UserCreationForm):
     form_name = 'reg_form'
     error_messages = {
@@ -75,6 +77,7 @@ class MyRegForm(UserCreationForm):
         return user
 
 
+# Функция для вывода родительской категории в optgroup тег
 def categories_as_choices(user):
         categories = []
         for category in user.category_set.filter(parent_category_id__isnull=True):
@@ -89,11 +92,13 @@ def categories_as_choices(user):
         return categories
 
 
+# Форма для редактирования/создания заметки
 class ModifyNoteForm(forms.ModelForm):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(ModifyNoteForm, self).__init__(*args, **kwargs)
+        # Добавляем атрибуты к fiels
         self.fields['categories'].choices = categories_as_choices(self.user)
         self.fields['categories'].label = 'Категории'
         self.fields['labels'].label = 'Ярлыки'
@@ -115,6 +120,7 @@ class ModifyNoteForm(forms.ModelForm):
         }
 
 
+# Форма для редактирования личных данных пользовтеля
 class EditProfileForm(forms.ModelForm):
 
     date_of_birth = forms.DateField(label='Дата рождения', required=True,
@@ -126,6 +132,7 @@ class EditProfileForm(forms.ModelForm):
         exclude = ('password',)
 
 
+# Форма для загрузки аватарки
 class EditAvatarForm(forms.ModelForm):
 
     avatar = forms.ImageField(label='Загрузить аватарку')
@@ -135,6 +142,7 @@ class EditAvatarForm(forms.ModelForm):
         fields = ('avatar', )
 
 
+# Форма для добавления собственных ярлыков
 class AddLabelForm(forms.ModelForm):
     file = forms.ImageField(label='Добавить значки')
 
