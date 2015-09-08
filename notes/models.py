@@ -61,7 +61,7 @@ class LabelDefault(models.Model):
 
 
 # Заметки
-class Notes(models.Model):
+class Note(models.Model):
     title = models.CharField(_('Название'), max_length=50, blank=False)
     message = models.CharField(_("Текст"), max_length=1000, blank=False)
     file = models.FileField(upload_to='notes/files/', blank=True)
@@ -79,7 +79,7 @@ class Notes(models.Model):
 # Ярлыки пользователя
 class LabelCustom(models.Model):
     file = models.ImageField(upload_to='notes/labels/custom/', blank=True)
-    note = models.ForeignKey(Notes, blank=True, null=True)
+    note = models.ForeignKey(Note, blank=True, null=True)
 
     def __str__(self):
         return str(self.file)

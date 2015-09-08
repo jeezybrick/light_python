@@ -16876,7 +16876,7 @@ function $SceDelegateProvider() {
  * <a name="contexts"></a>
  * ## What trusted context types are supported?
  *
- * | Context             | Notes          |
+ * | Context             | Note          |
  * |---------------------|----------------|
  * | `$sce.HTML`         | For HTML that's safe to source into the application.  The {@link ng.directive:ngBindHtml ngBindHtml} directive uses this context for bindings. If an unsafe value is encountered and the {@link ngSanitize $sanitize} module is present this will sanitize the value instead of throwing an error. |
  * | `$sce.CSS`          | For CSS that's safe to source into the application.  Currently unused.  Feel free to use it in your own directives. |
@@ -17798,7 +17798,7 @@ var originUrl = urlResolve(window.location.href);
 
 /**
  *
- * Implementation Notes for non-IE browsers
+ * Implementation Note for non-IE browsers
  * ----------------------------------------
  * Assigning a URL to the href property of an anchor DOM node, even one attached to the DOM,
  * results both in the normalizing and parsing of the URL.  Normalizing means that a relative
@@ -17808,7 +17808,7 @@ var originUrl = urlResolve(window.location.href);
  * compatibility - Safari 1+, Mozilla 1+, Opera 7+,e etc.  See
  * http://www.aptana.com/reference/html/api/HTMLAnchorElement.html
  *
- * Implementation Notes for IE
+ * Implementation Note for IE
  * ---------------------------
  * IE <= 10 normalizes the URL when assigned to the anchor node similar to the other
  * browsers.  However, the parsed components will not be set if the URL assigned did not specify
@@ -17845,7 +17845,7 @@ function urlResolve(url) {
   var href = url;
 
   if (msie) {
-    // Normalize before parse.  Refer Implementation Notes on why this is
+    // Normalize before parse.  Refer Implementation Note on why this is
     // done in two steps on IE.
     urlParsingNode.setAttribute("href", href);
     href = urlParsingNode.href;

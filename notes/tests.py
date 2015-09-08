@@ -1,5 +1,5 @@
 from django.test import Client, TestCase
-from .models import MyUser, Category, Notes
+from .models import MyUser, Category, Note
 
 """
 Тесты для првоерки:
@@ -13,7 +13,7 @@ class SimpleTest(TestCase):
     def setUp(self):
         self.user1 = MyUser.objects.create_user('temporary', 'temporary@gmail.com', 'temporary')
         self.user2 = MyUser.objects.create_user('temporary2', 'temporaryrr@gmail.com', 'temporary')
-        self.notes = Notes.objects.order_by('id')
+        self.notes = Note.objects.order_by('id')
         self.categories = Category.objects.order_by('id')
         self.category = Category(name='temporary', user_id=1)
         self.client = Client()
@@ -107,7 +107,7 @@ class SimpleTest(TestCase):
         response = self.client.get('/users/'+self.user1.username+'/notes/add/')
         self.assertEqual(response.status_code, 302)
 
-        note = Notes(title='temporary', message='message', color_id='2', user_id=self.user1.id)
+        note = Note(title='temporary', message='message', color_id='2', user_id=self.user1.id)
         note.save()
         fake_note_id = 9999
         fake_user_username = 'fake_username'
@@ -138,7 +138,7 @@ class SimpleTest(TestCase):
             self.client.post('/users/'+self.user1.username+'/notes/'+str(note.id)+'/edit/')
 
     def test_users_notes_show(self):
-        note = Notes(title='temporary', message='message', color_id='2', user_id=self.user1.id)
+        note = Note(title='temporary', message='message', color_id='2', user_id=self.user1.id)
         note.save()
         response = self.client.get('/users/'+self.user1.username+'/notes/'+str(note.id)+'/')
         self.assertEqual(response.status_code, 302)
@@ -153,7 +153,7 @@ class SimpleTest(TestCase):
             self.client.post('/users/'+self.user1.username+'/notes/'+str(note.id)+'/')
 
     def test_users_notes_delete(self):
-        note = Notes(title='temporary', message='message', color_id='2', user_id=self.user1.id)
+        note = Note(title='temporary', message='message', color_id='2', user_id=self.user1.id)
         note.save()
         fake_note_id = 9999
         fake_user_id = 9999
@@ -178,14 +178,14 @@ class SimpleTest(TestCase):
         self.client.logout()
 
         self.client.login(username='temporary2', password='temporary')
-        note = Notes(title='temporary', message='message', color_id='2', user_id=self.user1.id)
+        note = Note(title='temporary', message='message', color_id='2', user_id=self.user1.id)
         note.save()
         with self.assertRaisesMessage(Exception, 'Вы пытаетесь удалить заметку другому пользователю?'):
             self.client.post('/users/'+self.user1.username+'/notes/'+str(note.id)+'/delete/')
 
     def test_user_notes_labels_add(self):
 
-        note = Notes(title='temporary', message='message', color_id='2', user_id=self.user1.id)
+        note = Note(title='temporary', message='message', color_id='2', user_id=self.user1.id)
         note.save()
         response = self.client.get('/users/'+self.user1.username+'/notes/'+str(note.id)+'/labels/add/')
         self.assertEqual(response.status_code, 302)

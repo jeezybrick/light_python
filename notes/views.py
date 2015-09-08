@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
-from .models import MyUser, Notes, Category, LabelCustom
+from .models import MyUser, Note, Category, LabelCustom
 from .forms import MyRegForm, ModifyNoteForm, EditProfileForm, AddLabelForm, EditAvatarForm
 
 
@@ -60,15 +60,21 @@ def user_notes(request, username):
         pass
     else:
         raise Exception('Этот пользователь закрыл свои заметки.')
-    notes = user_owner.notes_set.order_by('-created_at')
-    paginator = Paginator(notes, 6)
-    page = request.GET.get('page')
+
+    # Проверяем если ли у выбранного пользователя созданные заметки
     try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
+        notes = user_owner.note_set.order_by('-created_at')
+    except AttributeError:
+        notes = None
+    else:
+        paginator = Paginator(notes, 6)
+        page = request.GET.get('page')
+        try:
+            notes = paginator.page(page)
+        except PageNotAnInteger:
+            notes = paginator.page(1)
+        except EmptyPage:
+            notes = paginator.page(paginator.num_pages)
     return render(request, 'notes/notes/index.html', {'notes': notes, 'user_owner': user_owner})
 
 
@@ -76,7 +82,7 @@ def user_notes(request, username):
 @login_required(login_url='/auth/login/')
 def user_notes_show(request, username, note_id):
     user_owner = get_object_or_404(MyUser, username=username)
-    note = get_object_or_404(Notes, id=note_id)
+    note = get_object_or_404(Note, id=note_id)
     # Заметка будет показана если пользователь является автором заметки или если он открыл их для общего доступа
     if user_owner.username == request.user.username or not user_owner.is_private:
         pass
@@ -94,7 +100,7 @@ def user_notes_modify(request, username, note_id=None):
     """
     if note_id is not None:
         try:
-            note = request.user.notes_set.get(id=note_id)
+            note = request.user.note_set.get(id=note_id)
         except:
             raise Exception('Вы пытаетесь редактировать заметку другому пользователю?')
         foo = 'Редактировать'
@@ -128,7 +134,7 @@ def user_notes_delete(request, username, note_id):
         user_owner = get_object_or_404(MyUser, username=username)
         if not user_owner.username == request.user.username:
             raise Exception('Вы пытаетесь удалить заметку другому пользователю?')
-        note = get_object_or_404(Notes, id=note_id)
+        note = get_object_or_404(Note, id=note_id)
         note.delete()
     return HttpResponseRedirect('/users/' + username + '/notes')
 
@@ -162,7 +168,7 @@ def user_notes_labels_add(request, username, note_id):
     if request.method == 'POST':
         form = AddLabelForm(request.POST, request.FILES)
         if form.is_valid():
-            note = request.user.notes_set.get(id=note_id)
+            note = request.user.note_set.get(id=note_id)
             first = form.save(commit=False)
             first.note = note
             first.save()
@@ -177,7 +183,7 @@ def user_notes_labels_add(request, username, note_id):
 @login_required(login_url='/auth/login/')
 def user_notes_labels_delete(request, username, note_id, label_id):
     try:
-        note = request.user.notes_set.get(id=note_id)
+        note = request.user.note_set.get(id=note_id)
     except:
         raise Exception('Вы пытаетесь удалить значок другого пользователя?')
     label = get_object_or_404(LabelCustom, id=label_id)

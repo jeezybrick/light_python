@@ -9,7 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.extras.widgets import SelectDateWidget
 from django.core import validators
-from .models import Notes, MyUser, LabelCustom
+from .models import Note, MyUser, LabelCustom
 from .widgets import MyWidgetForColor, MyWidgetForLabels
 
 
@@ -111,7 +111,7 @@ class ModifyNoteForm(forms.ModelForm):
     file = forms.FileField(label='Прикрепить файл', required=False)
 
     class Meta:
-        model = Notes
+        model = Note
         fields = ('title', 'message', 'color', 'categories', 'labels', 'file', )
         widgets = {
             # 'categories': forms.CheckboxSelectMultiple(attrs={'class': 'lal'}),
@@ -125,6 +125,12 @@ class EditProfileForm(forms.ModelForm):
 
     date_of_birth = forms.DateField(label='Дата рождения', required=True,
                                     widget=SelectDateWidget(years=range(2015, 1940, -1)))
+    phone = forms.CharField(max_length=30, label='Телефон',
+                            help_text='Телефон в формате ***-*******',
+                            validators=[
+                                validators.RegexValidator(r'^\d{3}\-\d{7}$',
+                                                          'Введите телефон в правильном формате!(***-*******)',
+                                                          'invalid'), ])
 
     class Meta:
         model = MyUser
