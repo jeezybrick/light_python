@@ -6,6 +6,8 @@
 4.Пользователь может открыть или закрыть доступ к заметкам<br />
 5.Пользователь может добавить свои собственные категории или ярлыки,аватар<br /><br />
 
-Требуемые пакеты:Django,django-bootstrap3,mysql-client<br />
-Тестовый пользователь для db.sqlite3:username:test  пароль:test12<br />
-БД по умолчанию в settins:sqlite.
+Требуемые пакеты:Django,django-bootstrap3,mysql-client.<br />
+Тестовый пользователь для db.sqlite3:username:test  пароль:test12.<br />
+БД по умолчанию в settins:sqlite.<br /><br />
+
+<strong>Перед запуском на тестовом файле бд требуется выполнить миграцию.</strong>
